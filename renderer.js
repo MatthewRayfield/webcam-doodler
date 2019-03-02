@@ -14,6 +14,8 @@ function Renderer() {
         isolateMaterial,
         overlayFilter,
         overlayMaterial,
+        fireFilter,
+        fireMaterial,
         basicMaterial = new THREE.MeshBasicMaterial({transparent: true});
 
     isolateFilter = new IsolateFilter();
@@ -22,8 +24,12 @@ function Renderer() {
     overlayFilter = new OverlayFilter();
     overlayMaterial = overlayFilter.material;
 
+    fireFilter = new FireFilter();
+    fireMaterial = fireFilter.material;
+
     self.overlayFilter = overlayFilter;
     self.isolateFilter = isolateFilter;
+    self.fireFilter = fireFilter;
 
     self.input = null;
 
@@ -111,7 +117,7 @@ function Renderer() {
         self.mesh.scale.x = self.width;
         self.mesh.scale.y = self.height;
 
-        //isolateMaterial.uniforms.resolution.value = new THREE.Vector2(self.width, self.height);
+        fireMaterial.uniforms.resolution.value = new THREE.Vector2(self.width, self.height);
     };
     window.addEventListener('resize', self.resize);
 
@@ -169,10 +175,10 @@ function Renderer() {
         self.mesh.material = isolateMaterial;
         self.tRenderer.render(self.scene, self.camera, self.renderTargetA);
 
-        overlayFilter.uniforms.inputImageTexture.value = oldRT.texture;
-        overlayFilter.uniforms.overlayTexture.value = self.renderTargetA.texture;
-        overlayFilter.uniforms.flipX.value = false;
-        self.mesh.material = overlayMaterial;
+        fireFilter.uniforms.inputImageTexture.value = oldRT.texture;
+        fireFilter.uniforms.overlayTexture.value = self.renderTargetA.texture;
+        fireFilter.uniforms.flipX.value = false;
+        self.mesh.material = fireMaterial;
         self.tRenderer.render(self.scene, self.camera, newRT);
 
         overlayFilter.uniforms.inputImageTexture.value = inputTexture;
