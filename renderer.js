@@ -8,7 +8,7 @@ function Renderer() {
         inputHeight = 0,
         needsUpdating = false,
 
-        container = document.getElementById('container'),
+        container = document.getElementById('video-container'),
 
         isolateFilter,
         isolateMaterial,
@@ -175,10 +175,10 @@ function Renderer() {
         self.mesh.material = isolateMaterial;
         self.tRenderer.render(self.scene, self.camera, self.renderTargetA);
 
-        fireFilter.uniforms.inputImageTexture.value = oldRT.texture;
-        fireFilter.uniforms.overlayTexture.value = self.renderTargetA.texture;
-        fireFilter.uniforms.flipX.value = false;
-        self.mesh.material = fireMaterial;
+        overlayFilter.uniforms.inputImageTexture.value = oldRT.texture;
+        overlayFilter.uniforms.overlayTexture.value = self.renderTargetA.texture;
+        overlayFilter.uniforms.flipX.value = false;
+        self.mesh.material = overlayMaterial;
         self.tRenderer.render(self.scene, self.camera, newRT);
 
         overlayFilter.uniforms.inputImageTexture.value = inputTexture;
@@ -194,8 +194,16 @@ function Renderer() {
         if (!inputTexture) return;
         if (needsUpdating) inputTexture.needsUpdate = true;
 
-        basicMaterial.map = inputTexture;
+        /*basicMaterial.map = inputTexture;
         self.mesh.material = basicMaterial;
         self.tRenderer.render(self.scene, self.camera, self.renderTargetD);
+        self.tRenderer.render(self.scene, self.camera);*/
+
+        overlayFilter.uniforms.inputImageTexture.value = inputTexture;
+        overlayFilter.uniforms.overlayTexture.value = null;
+        overlayFilter.uniforms.flipX.value = true;
+        self.mesh.material = overlayMaterial;
+        self.tRenderer.render(self.scene, self.camera, self.renderTargetD);
+        self.tRenderer.render(self.scene, self.camera);
     };
 }
