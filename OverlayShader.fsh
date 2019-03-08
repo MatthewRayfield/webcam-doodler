@@ -3,6 +3,7 @@ varying highp vec2 textureCoordinate;
 uniform highp sampler2D inputImageTexture;
 uniform highp sampler2D overlayTexture;
 uniform bool flipX;
+uniform bool erase;
 
 void main() {
     highp vec2 xy = textureCoordinate.xy;
@@ -15,10 +16,15 @@ void main() {
 
     highp vec4 colorO = texture2D(overlayTexture, xy);
 
-    color.rgb = mix(color.rgb, colorO.rgb, colorO.a);
+    if (erase) {
+        color.a -= colorO.a;
+    }
+    else {
+        color.rgb = mix(color.rgb, colorO.rgb, colorO.a);
 
-    if (colorO.a > color.a) {
-        color.a = colorO.a;
+        if (colorO.a > color.a) {
+            color.a = colorO.a;
+        }
     }
 
     gl_FragColor = color;

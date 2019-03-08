@@ -11,6 +11,9 @@ function OverlayFilter() {
         flipX: {
             type: 'b'
         },
+        erase: {
+            type: 'b'
+        }
     };
 
     self.material = new THREE.ShaderMaterial({

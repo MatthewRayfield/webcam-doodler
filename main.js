@@ -1,8 +1,18 @@
 var renderer,
+    colorPicked = false,
     pickingColor = false,
-    colorPicker = new Picker();
+    colorPicker = new Picker(),
+    colorPickerShown = false;
 
-var pickButton, thresholdRange, thresholdSpan, clearButton;
+var wrapperWrapper,
+    pickButton,
+    thresholdRange,
+    thresholdSpan,
+    clearButton,
+    eraseModeButton,
+    paintModeButton,
+    colorPickerWrapper,
+    colorPickerButton;
 
 var BasicVertexShader = [
         "varying vec2 textureCoordinate;",
@@ -16,6 +26,9 @@ var BasicVertexShader = [
 function loop() {
     if (pickingColor) {
         pickColor();
+    }
+    else if (!colorPicked) {
+        renderer.renderForColorPick();
     }
     else {
         renderer.render();
@@ -39,9 +52,8 @@ function pickColor() {
     g = data[((y*renderer.width)+x)*4+1];
     b = data[((y*renderer.width)+x)*4+2];
 
-    document.body.style.background = 'rgb('+r+','+g+','+b+')';
-    console.log('rgb('+r+','+g+','+b+')');
-
+    colorPicked = true;
+    pickButton.style.background = 'rgb('+r+','+g+','+b+')';
     renderer.isolateFilter.uniforms.targetColor.value = new THREE.Vector3(r/255, g/255, b/255);
 }
 
@@ -97,12 +109,17 @@ function Picker() {
         cursorCanvas = createElement('canvas', {width: boxWidth+sliderMargin+sliderWidth, height: boxHeight, style: {position: 'absolute', top: 0, left: 0}}),
         outputBox = createElement('div', {style: {width: boxHeight+sliderMargin+sliderWidth, height: outputHeight, marginTop: outputMargin}}),
         backgroundContext = backgroundCanvas.getContext('2d'),
-        cursorContext = cursorCanvas.getContext('2d');
+        cursorContext = cursorCanvas.getContext('2d'),
+        renderedSlider = false;
+
+    outputBox.style.display = 'none';
 
     self.element = createElement('div', {style: {position: 'relative'}}, [backgroundCanvas, cursorCanvas, outputBox]);
     self.h = .5;
-    self.s = .5;
-    self.v = .5;
+    self.s = 1;
+    self.v = 1;
+
+    self.onChange = null;
 
     function renderBackground() {
         var rgb, x, y;
@@ -114,12 +131,16 @@ function Picker() {
                 backgroundContext.fillStyle = 'rgb('+rgb.r+','+rgb.g+','+rgb.b+')';
                 backgroundContext.fillRect(x, y, 1, 1);
 
-                // SLIDER
-                rgb = HSVtoRGB(y/boxHeight, 1, 1);
-                backgroundContext.fillStyle = 'rgb('+rgb.r+','+rgb.g+','+rgb.b+')';
-                backgroundContext.fillRect(boxWidth+sliderMargin, y, sliderWidth, 1);
+                if (!renderedSlider) {
+                    // SLIDER
+                    rgb = HSVtoRGB(y/boxHeight, 1, 1);
+                    backgroundContext.fillStyle = 'rgb('+rgb.r+','+rgb.g+','+rgb.b+')';
+                    backgroundContext.fillRect(boxWidth+sliderMargin, y, sliderWidth, 1);
+                }
             }
         }
+
+        renderedSlider = true;
     }
 
     function renderCursors() {
@@ -156,6 +177,10 @@ function Picker() {
         self.b = rgb.b;
 
         outputBox.style.background = 'rgb('+self.r+','+self.g+','+self.b+')';
+
+        if (self.onChange) {
+            self.onChange();
+        }
     }
 
     renderBackground();
@@ -188,19 +213,59 @@ function Picker() {
     cursorCanvas.addEventListener('mousemove', mouseInput);
 }
 
+function colorPickerButtonClick() {
+    var rect = colorPickerButton.getBoundingClientRect();
+
+    colorPickerWrapper.style.left = rect.left;
+    colorPickerWrapper.style.bottom = window.innerHeight - rect.top;
+
+    colorPickerShown = !colorPickerShown;
+    if (colorPickerShown) {
+        colorPickerWrapper.style.display = 'block';
+    }
+    else {
+        colorPickerWrapper.style.display = 'none';
+    }
+}
+
+function colorPickerChange() {
+    colorPickerButton.style.background = 'rgb('+colorPicker.r+','+colorPicker.g+','+colorPicker.b+')';
+    renderer.isolateFilter.uniforms.outputColor.value = new THREE.Vector3(colorPicker.r/255, colorPicker.g/255, colorPicker.b/255);
+}
+
+function eraseModeClick() {
+    renderer.erase = true;
+    eraseModeButton.style.textDecoration = 'underline';
+    paintModeButton.style.textDecoration = 'none';
+}
+
+function paintModeClick() {
+    renderer.erase = false;
+    eraseModeButton.style.textDecoration = 'none';
+    paintModeButton.style.textDecoration = 'underline';
+}
+
 window.addEventListener('load', function () {
+    wrapperWrapper = document.getElementById('wrapper-wrapper');
     pickButton = document.getElementById('pick-button');
     thresholdRange = document.getElementById('threshold-range');
     thresholdSpan = document.getElementById('threshold-span');
     clearButton = document.getElementById('clear-button');
+    eraseModeButton = document.getElementById('erase-button');
+    paintModeButton = document.getElementById('paint-button');
+    colorPickerWrapper = document.getElementById('color-picker-wrapper');
+    colorPickerButton = document.getElementById('color-picker-button');
 
     pickButton.addEventListener('mousedown', pickButtonDown);
     document.addEventListener('mouseup', pickButtonUp);
     thresholdRange.addEventListener('input', updateThreshold);
+    eraseModeButton.addEventListener('click', eraseModeClick);
+    paintModeButton.addEventListener('click', paintModeClick);
+    colorPickerButton.addEventListener('click', colorPickerButtonClick);
 
     renderer = new Renderer();
 
-    clearButton.addEventListener('click', renderer.resize);
+    clearButton.addEventListener('click', renderer.resize); // TODO fix ?
 
     loop();
 
@@ -209,8 +274,10 @@ window.addEventListener('load', function () {
             //document.getElementById('message').innerHTML = 'loading webcam...';
         }
     });
-
-    document.getElementById('picker').appendChild(colorPicker.element);
+    
+    colorPickerChange();
+    colorPickerWrapper.appendChild(colorPicker.element);
+    colorPicker.onChange = colorPickerChange;
 });
 
 function useWebcam(callback) {

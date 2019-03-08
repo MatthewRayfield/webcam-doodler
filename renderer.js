@@ -1,5 +1,3 @@
-var filter;
-
 function Renderer() {
     var self = this,
 
@@ -30,6 +28,7 @@ function Renderer() {
     self.overlayFilter = overlayFilter;
     self.isolateFilter = isolateFilter;
     self.fireFilter = fireFilter;
+    self.erase = false;
 
     self.input = null;
 
@@ -56,8 +55,10 @@ function Renderer() {
     self.renderTargetD = new THREE.WebGLRenderTarget(self.width, self.height, {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter});
 
     self.resize = function () {
-        var pageWidth = window.innerWidth * .9,
-            pageHeight = window.innerHeight * .9;
+        var pageWidth = wrapperWrapper.offsetWidth,
+            pageHeight = wrapperWrapper.offsetHeight;
+        /*var pageWidth = window.innerWidth * .9,
+            pageHeight = window.innerHeight * .9;*/
 
         if (!inputWidth || !inputHeight) return;
         container.className = 'show';
@@ -153,7 +154,6 @@ function Renderer() {
         self.resize();
     };
 
-    //var tex = THREE.ImageUtils.loadTexture('nothing.png');
     var flip = 0;
     self.render = function render() {
         var oldRT, newRT;
@@ -178,12 +178,14 @@ function Renderer() {
         overlayFilter.uniforms.inputImageTexture.value = oldRT.texture;
         overlayFilter.uniforms.overlayTexture.value = self.renderTargetA.texture;
         overlayFilter.uniforms.flipX.value = false;
+        overlayFilter.uniforms.erase.value = self.erase;
         self.mesh.material = overlayMaterial;
         self.tRenderer.render(self.scene, self.camera, newRT);
 
         overlayFilter.uniforms.inputImageTexture.value = inputTexture;
         overlayFilter.uniforms.overlayTexture.value = newRT.texture;
         overlayFilter.uniforms.flipX.value = true;
+        overlayFilter.uniforms.erase.value = false;
         self.mesh.material = overlayMaterial;
         self.tRenderer.render(self.scene, self.camera);
 
@@ -194,14 +196,10 @@ function Renderer() {
         if (!inputTexture) return;
         if (needsUpdating) inputTexture.needsUpdate = true;
 
-        /*basicMaterial.map = inputTexture;
-        self.mesh.material = basicMaterial;
-        self.tRenderer.render(self.scene, self.camera, self.renderTargetD);
-        self.tRenderer.render(self.scene, self.camera);*/
-
         overlayFilter.uniforms.inputImageTexture.value = inputTexture;
         overlayFilter.uniforms.overlayTexture.value = null;
         overlayFilter.uniforms.flipX.value = true;
+        overlayFilter.uniforms.erase.value = false;
         self.mesh.material = overlayMaterial;
         self.tRenderer.render(self.scene, self.camera, self.renderTargetD);
         self.tRenderer.render(self.scene, self.camera);

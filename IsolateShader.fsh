@@ -4,6 +4,7 @@ uniform highp sampler2D inputImageTexture;
 uniform highp vec2 resolution;
 uniform highp vec3 targetColor;
 uniform highp float threshold;
+uniform highp vec3 outputColor;
 
 vec3 rgb2hsv(vec3 c) {
     vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -23,10 +24,13 @@ void main() {
     highp vec3 hsv = rgb2hsv(color.rgb);
     highp vec3 hsvTarget = rgb2hsv(targetColor);
 
-    if (distance(hsv, hsvTarget) < threshold) {
-    //if (distance(color.rgb, targetColor) < threshold) {
-        color.a = 1.0;
-        color.rgb = vec3(0.0,1.0,1.0);
+    highp float d = distance(hsv, hsvTarget);
+    //highp float d = distance(color.rgb, targetColor);
+
+    if (d < threshold * 1.25) {
+        color.rgb = outputColor;
+
+        color.a = ((threshold * .25) - (d - threshold)) / (threshold * .25);
     }
     else {
         color = vec4(0.0,0.0,0.0,0.0);

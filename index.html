@@ -1,12 +1,32 @@
 <style>
+    body {
+        -webkit-font-smoothing: antialiased;
+        margin: 0;
+        background: url('bg.png');
+    }
+    button:focus {
+        outline:0;
+    }
+    button {
+        font: 20px georgia;
+        height: 50px;
+        padding: 0 20px;
+        background: transparent;
+        border: none;
+        margin: 0 5px;
+    }
     #wrapper-wrapper {
         display: flex;
         justify-content: center;
+        width: 100%;
+        height: calc(100% - 70px);
+        margin-top: 20px;
     }
     #video-wrapper {
         display: inline-block;
-        background: red;
         position: relative;
+    }
+    #video-container {
     }
     #overlay {
         position: absolute;
@@ -37,10 +57,14 @@
         display: flex;
         justify-content: center;
     }
-    #picker {
+    #color-picker-wrapper {
+        display: none;
         position: absolute;
-        top: 0;
-        left: 0;
+    }
+    #color-picker-button {
+    }
+    #paint-button {
+        text-decoration: underline;
     }
 </style>
 <script src="utils.js"></script>
@@ -62,9 +86,12 @@
     </div>
 </div>
 <div id="controls">
-    <button id="pick-button">pick</button>
+    <button id="pick-button">target color</button>
     <input type="range" id="threshold-range" min="0" max=".5" step=".001" value=".2" />
     <span id="threshold-span"></span>
     <button id="clear-button">clear</button>
+    <button id="erase-button">erase mode</button>
+    <button id="paint-button">paint mode</button>
+    <button id="color-picker-button">paint color</button>
 </div>
-<div id="picker"></div>
+<div id="color-picker-wrapper"></div>

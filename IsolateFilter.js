@@ -8,7 +8,7 @@ function IsolateFilter() {
         },
         targetColor: {
             type: "v3",
-            value: new THREE.Vector3(214/255, 59/255, 102/255)
+            value: new THREE.Vector3(1, .996, 1)
         },
         threshold: {
             type: "f",
@@ -16,6 +16,10 @@ function IsolateFilter() {
         },
         inputImageTexture: {
             type: 't'
+        },
+        outputColor: {
+            type: "v3",
+            value: new THREE.Vector3(0, 1, 1)
         },
     };
 
