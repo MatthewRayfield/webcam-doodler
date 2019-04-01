@@ -66,6 +66,36 @@
     #paint-button {
         text-decoration: underline;
     }
+    .slider {
+        position: relative;
+        background: transparent;
+        margin: 0 5px;
+        overflow: hidden;
+        vertical-align: top;
+    }
+    .slider .label {
+        font: 20px georgia;
+        display: inline-flex;
+        align-items: center;
+        line-height: 50px;
+        height: 50px;
+        padding: 0 20px;
+        white-space: nowrap;
+    }
+    .slider .label .number {
+        font-family: monospace;
+        margin-left: 10px;
+    }
+    .slider .inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: black;
+        overflow: hidden;
+    }
+    .slider .inner .label {
+        color: white;
+    }
 </style>
 <script src="utils.js"></script>
 <script src="three.js"></script>
@@ -87,7 +117,7 @@
 </div>
 <div id="controls">
     <button id="pick-button">target color</button>
-    <input type="range" id="threshold-range" min="0" max=".5" step=".001" value=".2" />
+    <!--<input type="range" id="threshold-range" min="0" max=".5" step=".001" value=".2" />-->
     <span id="threshold-span"></span>
     <button id="clear-button">clear</button>
     <button id="erase-button">erase mode</button>

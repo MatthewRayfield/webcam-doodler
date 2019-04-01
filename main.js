@@ -6,13 +6,13 @@ var renderer,
 
 var wrapperWrapper,
     pickButton,
-    thresholdRange,
     thresholdSpan,
     clearButton,
     eraseModeButton,
     paintModeButton,
     colorPickerWrapper,
-    colorPickerButton;
+    colorPickerButton,
+    thresholdSlider;
 
 var BasicVertexShader = [
         "varying vec2 textureCoordinate;",
@@ -58,10 +58,9 @@ function pickColor() {
 }
 
 function updateThreshold() {
-    var threshold = thresholdRange.value;
+    var threshold = (thresholdSlider.value/100) * .5;
 
     renderer.isolateFilter.uniforms.threshold.value = threshold;
-    thresholdSpan.innerHTML = threshold;
 }
 
 function pickButtonDown() {
@@ -213,6 +212,67 @@ function Picker() {
     cursorCanvas.addEventListener('mousemove', mouseInput);
 }
 
+function Slider(minimum, maximum, value, increment, label, padding) {
+    var self = this;
+
+    self.minimum = minimum || 0;
+    self.maximum = maximum || 1;
+    self.value = value || .5;
+    self.increment = increment || .001;
+    self.labelText = label || 'label';
+    self.padding = padding;
+
+    self.label = createElement('span', {className: 'label'});
+    self.innerLabel = createElement('span', {className: 'label'});
+    self.inner = createElement('span', {className: 'inner'}, [self.innerLabel]);
+    self.element = createElement('span', {className: 'slider'}, [self.label, self.inner]);
+    self.onchange = null;
+
+    function pad(value) {
+        var s = value + '';
+
+        while (s.length < self.padding) {
+            s = ' ' + s;
+        }
+
+        s = s.replace(/ /g, '&nbsp;');
+
+        return s;
+    }
+
+    self.render = function () {
+        var percent = (self.value - self.minimum) / (self.maximum - self.minimum);
+
+        self.inner.style.width = self.element.offsetWidth * percent;
+        // yeahhhh the next line is kinda gross... :p
+        self.innerLabel.innerHTML = self.label.innerHTML = self.labelText + '<span class="number">' + pad(self.value) + '</span>';
+    };
+
+    self.render();
+
+    function handleMouse(event) {
+        var percent;
+
+        event.preventDefault();
+
+        if (event.buttons != 1) return;
+
+        percent = (event.pageX - self.element.offsetLeft) / self.element.offsetWidth;
+        percent = Math.min(Math.max(0, percent), 1);
+        self.value = (percent * (self.maximum - self.minimum)) + self.minimum;
+        self.value = Math.round(self.value / self.increment) * self.increment;
+
+        self.render();
+
+        if (self.onchange) {
+            self.onchange();
+        }
+    }
+
+    self.element.addEventListener('mousemove', handleMouse);
+    self.element.addEventListener('mousedown', handleMouse);
+}
+
 function colorPickerButtonClick() {
     var rect = colorPickerButton.getBoundingClientRect();
 
@@ -248,7 +308,6 @@ function paintModeClick() {
 window.addEventListener('load', function () {
     wrapperWrapper = document.getElementById('wrapper-wrapper');
     pickButton = document.getElementById('pick-button');
-    thresholdRange = document.getElementById('threshold-range');
     thresholdSpan = document.getElementById('threshold-span');
     clearButton = document.getElementById('clear-button');
     eraseModeButton = document.getElementById('erase-button');
@@ -258,10 +317,14 @@ window.addEventListener('load', function () {
 
     pickButton.addEventListener('mousedown', pickButtonDown);
     document.addEventListener('mouseup', pickButtonUp);
-    thresholdRange.addEventListener('input', updateThreshold);
     eraseModeButton.addEventListener('click', eraseModeClick);
     paintModeButton.addEventListener('click', paintModeClick);
     colorPickerButton.addEventListener('click', colorPickerButtonClick);
+
+    thresholdSlider = new Slider(0, 100, 40, 1, 'sensitivity', 3);
+    thresholdSpan.appendChild(thresholdSlider.element);
+    setTimeout(thresholdSlider.render, 100);
+    thresholdSlider.onchange = updateThreshold;
 
     renderer = new Renderer();
 
