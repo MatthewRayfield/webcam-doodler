@@ -94,6 +94,12 @@ function pickColor() {
 
     colorPicked = true;
     pickButton.style.background = 'rgb('+r+','+g+','+b+')';
+    if ((r + g + b) / 3 < 128) {
+        pickButton.style.color = 'white';
+    }
+    else {
+        pickButton.style.color = 'black';
+    }
     renderer.isolateFilter.uniforms.targetColor.value = new THREE.Vector3(r/255, g/255, b/255);
 }
 
@@ -333,6 +339,13 @@ function colorPickerButtonClick() {
 }
 
 function colorPickerChange() {
+    if ((colorPicker.r + colorPicker.g + colorPicker.b) / 3 < 128) {
+        colorPickerButton.style.color = 'white';
+    }
+    else {
+        colorPickerButton.style.color = 'black';
+    }
+
     colorPickerButton.style.background = 'rgb('+colorPicker.r+','+colorPicker.g+','+colorPicker.b+')';
     renderer.isolateFilter.uniforms.outputColor.value = new THREE.Vector3(colorPicker.r/255, colorPicker.g/255, colorPicker.b/255);
 }
