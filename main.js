@@ -13,6 +13,7 @@ var wrapperWrapper,
     colorPickerWrapper,
     colorPickerButton,
     thresholdSlider,
+    saveButton,
     header, closeLink;
 
 var BasicVertexShader = [
@@ -317,6 +318,7 @@ window.addEventListener('load', function () {
     colorPickerButton = document.getElementById('color-picker-button');
     header = document.getElementById('header');
     closeLink = document.getElementById('close-link');
+    saveButton = document.getElementById('save-button');
 
     pickButton.addEventListener('mousedown', pickButtonDown);
     document.addEventListener('mouseup', pickButtonUp);
@@ -333,6 +335,11 @@ window.addEventListener('load', function () {
 
     clearButton.addEventListener('click', renderer.resize); // TODO fix ?
     closeLink.addEventListener('click', function () {header.style.display = 'none';});
+    saveButton.addEventListener('click', function () {
+        var dataUrl = renderer.tRenderer.domElement.toDataURL('image/png');
+
+        download(dataUrl, 'webcam-doodler-' + (Date.now()) + '.png', 'image/png');
+    });
 
     loop();
 
