@@ -8,6 +8,7 @@
         background: url('bg.png');
         height: 100%;
         font-family: 'Overpass Mono', monospace;
+        color: black;
     }
     a {
         color: #8177ef;
@@ -24,7 +25,11 @@
         border: none;
         margin: 0 5px;
         cursor: pointer;
+        outline: none;
+        color: black;
     }
+    :focus {outline:none;}
+    ::-moz-focus-inner {border:0;}
     #main {
         display: flex;
         flex-direction: column;
