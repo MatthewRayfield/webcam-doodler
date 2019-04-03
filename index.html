@@ -1,26 +1,53 @@
+<link href="https://fonts.googleapis.com/css?family=Overpass+Mono" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
     body {
         -webkit-font-smoothing: antialiased;
         margin: 0;
         background: url('bg.png');
+        height: 100%;
+        font-family: 'Overpass Mono', monospace;
+    }
+    a {
+        color: #8177ef;
     }
     button:focus {
-        outline:0;
+        outline: 0;
     }
     button {
-        font: 20px georgia;
-        height: 50px;
+        font-family: 'Overpass Mono', monospace;
+        font-size: 20px;
+        height: 40px;
         padding: 0 20px;
         background: transparent;
         border: none;
         margin: 0 5px;
     }
+    #main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    #header {
+        position: absolute;
+        top: 10;
+        left: 10;
+        font-size: 15px;
+    }
+    #header span {
+        display: inline-block;
+        margin-bottom: 2px;
+        padding: 2px 10px;
+        background: white;
+    }
     #wrapper-wrapper {
         display: flex;
+        flex-grow: 1;
         justify-content: center;
+        align-items: center;
         width: 100%;
-        height: calc(100% - 70px);
-        margin-top: 20px;
+        overflow: hidden;
     }
     #video-wrapper {
         display: inline-block;
@@ -56,6 +83,7 @@
     #controls {
         display: flex;
         justify-content: center;
+        flex-wrap: wrap;
     }
     #color-picker-wrapper {
         display: none;
@@ -72,18 +100,18 @@
         margin: 0 5px;
         overflow: hidden;
         vertical-align: top;
+        display: inline-block;
     }
     .slider .label {
-        font: 20px georgia;
+        font-size: 20px;
         display: inline-flex;
         align-items: center;
-        line-height: 50px;
-        height: 50px;
+        line-height: 40px;
+        height: 40px;
         padding: 0 20px;
         white-space: nowrap;
     }
     .slider .label .number {
-        font-family: monospace;
         margin-left: 10px;
     }
     .slider .inner {
@@ -107,21 +135,29 @@
 <script src="FireFilter.js"></script>
 <script src="renderer.js"></script>
 <script src="main.js"></script>
-<div id="wrapper-wrapper">
-    <div id="video-wrapper">
-        <div id="video-container"></div>
-        <div id="overlay">
-            <div id="circle"></div>
+<div id="main">
+    <div id="wrapper-wrapper">
+        <div id="video-wrapper">
+            <div id="video-container"></div>
+            <div id="overlay">
+                <div id="circle"></div>
+            </div>
         </div>
     </div>
-</div>
-<div id="controls">
-    <button id="pick-button">target color</button>
-    <!--<input type="range" id="threshold-range" min="0" max=".5" step=".001" value=".2" />-->
-    <span id="threshold-span"></span>
-    <button id="clear-button">clear</button>
-    <button id="erase-button">erase mode</button>
-    <button id="paint-button">paint mode</button>
-    <button id="color-picker-button">paint color</button>
+    <div id="controls">
+        <button id="pick-button">target color</button>
+        <!--<input type="range" id="threshold-range" min="0" max=".5" step=".001" value=".2" />-->
+        <span id="threshold-span"></span>
+        <button id="clear-button">clear</button>
+        <button id="erase-button">erase mode</button>
+        <button id="paint-button">paint mode</button>
+        <button id="color-picker-button">paint color</button>
+    </div>
 </div>
 <div id="color-picker-wrapper"></div>
+<div id="header">
+    <span>webcam doodler v1.0</span><br />
+    <span>by <a href="http://matthewrayfield.com">matthew rayfield world</a></span><br />
+    <span>instructional video <a href="">here</a></span><br />
+    <span><a href="javascript:void(0)" id="close-link">click</a> to close this message</span>
+</div>

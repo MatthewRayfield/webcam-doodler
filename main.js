@@ -12,7 +12,8 @@ var wrapperWrapper,
     paintModeButton,
     colorPickerWrapper,
     colorPickerButton,
-    thresholdSlider;
+    thresholdSlider,
+    header, closeLink;
 
 var BasicVertexShader = [
         "varying vec2 textureCoordinate;",
@@ -314,6 +315,8 @@ window.addEventListener('load', function () {
     paintModeButton = document.getElementById('paint-button');
     colorPickerWrapper = document.getElementById('color-picker-wrapper');
     colorPickerButton = document.getElementById('color-picker-button');
+    header = document.getElementById('header');
+    closeLink = document.getElementById('close-link');
 
     pickButton.addEventListener('mousedown', pickButtonDown);
     document.addEventListener('mouseup', pickButtonUp);
@@ -329,6 +332,7 @@ window.addEventListener('load', function () {
     renderer = new Renderer();
 
     clearButton.addEventListener('click', renderer.resize); // TODO fix ?
+    closeLink.addEventListener('click', function () {header.style.display = 'none';});
 
     loop();
 
