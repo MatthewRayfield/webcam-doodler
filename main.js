@@ -378,7 +378,7 @@ window.addEventListener('load', function () {
 
     renderer = new Renderer();
 
-    clearButton.addEventListener('click', renderer.resize); // TODO fix ?
+    clearButton.addEventListener('click', renderer.clearDrawing);
     closeLink.addEventListener('click', function () {header.style.display = 'none';});
     saveButton.addEventListener('click', function () {
         var dataUrl = renderer.tRenderer.domElement.toDataURL('image/png');

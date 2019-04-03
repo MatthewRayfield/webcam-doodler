@@ -14,7 +14,10 @@ function Renderer() {
         overlayMaterial,
         fireFilter,
         fireMaterial,
-        basicMaterial = new THREE.MeshBasicMaterial({transparent: true});
+        basicMaterial = new THREE.MeshBasicMaterial({transparent: true}),
+
+        flip = false,
+        resizeAgain = false;
 
     isolateFilter = new IsolateFilter();
     isolateMaterial = isolateFilter.material;
@@ -57,11 +60,8 @@ function Renderer() {
     self.resize = function () {
         var pageWidth = wrapperWrapper.offsetWidth,
             pageHeight = wrapperWrapper.offsetHeight;
-        /*var pageWidth = window.innerWidth * .9,
-            pageHeight = window.innerHeight * .9;*/
 
         if (!inputWidth || !inputHeight) return;
-        container.className = 'show';
 
         if (inputWidth > inputHeight) {
             self.width = pageWidth;
@@ -111,9 +111,21 @@ function Renderer() {
         self.camera.updateProjectionMatrix();
 
         self.renderTargetA = new THREE.WebGLRenderTarget(self.width, self.height, {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter});
-        self.renderTargetB = new THREE.WebGLRenderTarget(self.width, self.height, {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter});
-        self.renderTargetC = new THREE.WebGLRenderTarget(self.width, self.height, {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter});
         self.renderTargetD = new THREE.WebGLRenderTarget(self.width, self.height, {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter});
+
+        // weeee this next part is to retain the drawing while resizing
+        if (flip) {
+            self.renderTargetC = new THREE.WebGLRenderTarget(self.width, self.height, {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter});
+        }
+        else {
+            self.renderTargetB = new THREE.WebGLRenderTarget(self.width, self.height, {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter});
+        }
+        if (!resizeAgain) {
+            resizeAgain = true;
+        }
+        else {
+            resizeAgain = false;
+        }
 
         self.mesh.scale.x = self.width;
         self.mesh.scale.y = self.height;
@@ -154,7 +166,6 @@ function Renderer() {
         self.resize();
     };
 
-    var flip = 0;
     self.render = function render() {
         var oldRT, newRT;
 
@@ -190,6 +201,10 @@ function Renderer() {
         self.tRenderer.render(self.scene, self.camera);
 
         flip = !flip;
+        
+        if (resizeAgain) {
+            self.resize();
+        }
     };
 
     self.renderForColorPick = function renderForColorPick() {
@@ -203,5 +218,10 @@ function Renderer() {
         self.mesh.material = overlayMaterial;
         self.tRenderer.render(self.scene, self.camera, self.renderTargetD);
         self.tRenderer.render(self.scene, self.camera);
+    };
+
+    self.clearDrawing = function clearDrawing() {
+        self.renderTargetC = new THREE.WebGLRenderTarget(self.width, self.height, {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter});
+        self.renderTargetB = new THREE.WebGLRenderTarget(self.width, self.height, {minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter});
     };
 }
