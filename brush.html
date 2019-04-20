@@ -1,0 +1,220 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<style>
+    body {
+        margin: 0;
+        font: 20px monospace;
+    }
+    #circle {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -50px;
+        margin-left: -50px;
+        width: 100px;
+        height: 100px;
+        background: white;
+        border-radius: 50px;
+    }
+    #smiley {
+        display: none;
+        position: absolute;
+        top: 25%;
+        left: 5%;
+        width: 90%;
+    }
+    #back {
+        background: black;
+        width: 100%;
+        height: 100%;
+    }
+    .spray {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -10px;
+        margin-left: -10px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 10px;
+    }
+    #twist {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -55px;
+        margin-left: -15px;
+    }
+    #twist .dot {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 25px;
+    }
+    #twist .dot:last-child {
+        margin-top: 100px;
+    }
+    #fullscreen-button {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: 10;
+        width: 100%;
+        color: #555;
+        text-align: center;
+        padding: 10px 0;
+    }
+    #brush-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        width: 100%;
+        color: #555;
+        text-align: center;
+        padding: 10px 0;
+    }
+</style>
+<div id="back">
+    <div id="brush-button">circle brush</div>
+    <div id="circle"></div>
+    <img id="smiley" src="smiley.png" />
+    <div id="twist">
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+    <div id="fullscreen-button">enter fullscreen</div>
+</div>
+<script src="utils.js"></script>
+<script>
+    var backElement,
+        circleElement,
+        sprayElements = [],
+        smileyElement,
+        twistElement,
+        spraying = false,
+        brushNames = ['circle', 'spray', 'smiley', 'twist'],
+        currentBrush = 0;
+
+    function removeSpray() {
+        var element;
+
+        while (sprayElements.length) {
+            element = sprayElements.pop();
+            backElement.removeChild(element);
+        }
+    }
+
+    function addSpray() {
+        var r, i, element,
+            mX = backElement.offsetWidth / 2,
+            mY = backElement.offsetHeight / 2,
+            d = backElement.offsetWidth * .2;
+
+        r = Math.floor(Math.random()*10)+5;
+
+        for (i = 0; i < r; i ++) {
+            element = createElement(
+                'div',
+                {
+                    className: 'spray',
+                    style: {
+                        top: ((Math.random()*d*2)-d+mY) + 'px',
+                        left: ((Math.random()*d*2)-d+mX) + 'px'
+                    }
+                }
+            );
+
+            backElement.appendChild(element);
+            sprayElements.push(element);
+        }
+    }
+
+    function loop() {
+        if (brushNames[currentBrush] == 'spray' && spraying) {
+            removeSpray();
+            addSpray();
+        }
+        else {
+            removeSpray();
+        }
+
+        if (brushNames[currentBrush] == 'twist') {
+            twistElement.style.transform = 'rotate(' + (Math.floor(Date.now() / 2)%360) + 'deg)';
+        }
+
+        setTimeout(loop, 20);
+    }
+
+    window.addEventListener('load', function () {
+        var fullscreenButton = document.getElementById('fullscreen-button'),
+            brushButton = document.getElementById('brush-button');
+
+        circleElement = document.getElementById('circle');
+        smileyElement = document.getElementById('smiley');
+        twistElement = document.getElementById('twist');
+
+        backElement = document.getElementById('back');
+
+        fullscreenButton.addEventListener(mouseOrTouch('down'), function (event) {
+            var fsElement = backElement;
+
+            if (!document.fullscreenElement) {
+                const rfs =
+                        fsElement.requestFullscreen ||
+                        fsElement.webkitRequestFullScreen ||
+                        fsElement.mozRequestFullScreen ||
+                        fsElement.msRequestFullscreen;
+                rfs.call(fsElement);
+
+                fullscreenButton.innerHTML = 'exit fullscreen';
+            }
+            else {
+                document.exitFullscreen();
+                fullscreenButton.innerHTML = 'enter fullscreen';
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        brushButton.addEventListener(mouseOrTouch('down'), function (event) {
+            currentBrush = (currentBrush + 1) % brushNames.length;
+
+            brushButton.innerHTML = brushNames[currentBrush] + ' brush';
+
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        backElement.addEventListener(mouseOrTouch('down'), function (event) {
+            event.preventDefault();
+
+            if (brushNames[currentBrush] == 'spray') {
+                spraying = true;
+            }
+            else if (brushNames[currentBrush] == 'circle') {
+                circleElement.style.display = 'block';
+            }
+            else if (brushNames[currentBrush] == 'smiley') {
+                smileyElement.style.display = 'block';
+            }
+            else if (brushNames[currentBrush] == 'twist') {
+                twistElement.style.display = 'block';
+            }
+
+        });
+        backElement.addEventListener(mouseOrTouch('up'), function (event) {
+            event.preventDefault();
+
+            spraying = false;
+            circleElement.style.display = 'none';
+            smileyElement.style.display = 'none';
+            twistElement.style.display = 'none';
+        });
+
+        loop();
+    });
+</script>
