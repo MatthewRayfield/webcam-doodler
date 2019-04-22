@@ -12,8 +12,6 @@ function Renderer() {
         isolateMaterial,
         overlayFilter,
         overlayMaterial,
-        fireFilter,
-        fireMaterial,
         basicMaterial = new THREE.MeshBasicMaterial({transparent: true}),
 
         flip = false,
@@ -25,12 +23,8 @@ function Renderer() {
     overlayFilter = new OverlayFilter();
     overlayMaterial = overlayFilter.material;
 
-    fireFilter = new FireFilter();
-    fireMaterial = fireFilter.material;
-
     self.overlayFilter = overlayFilter;
     self.isolateFilter = isolateFilter;
-    self.fireFilter = fireFilter;
     self.erase = false;
 
     self.input = null;
@@ -129,8 +123,6 @@ function Renderer() {
 
         self.mesh.scale.x = self.width;
         self.mesh.scale.y = self.height;
-
-        fireMaterial.uniforms.resolution.value = new THREE.Vector2(self.width, self.height);
     };
     window.addEventListener('resize', self.resize);
 
