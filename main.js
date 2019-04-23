@@ -325,6 +325,11 @@ function paintModeClick() {
 }
 
 window.addEventListener('load', function () {
+    if (location.host.indexOf('localhost') == -1 && location.protocol != 'https:') {
+        location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+        return;
+    }
+
     wrapperWrapper = document.getElementById('wrapper-wrapper');
     pickButton = document.getElementById('pick-button');
     thresholdSpan = document.getElementById('threshold-span');
